@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 5 Anime</title>
+    <style>
+        body { 
+            background: url('image/sfondo.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0; /* Aggiunto per rimuovere il margine predefinito */
+            padding: 0; /* Aggiunto per rimuovere il padding predefinito */
+        }
+
+        .top-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0; /* Ridotto il margine superiore per farlo salire */
+            padding-top: 20px; /* Aggiunto padding-top per separarlo dal bordo superiore */
+        }
+
+        .top-title img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .top-title h1 {
+            color: rgb(79, 165, 199);
+            font-size: 46px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .anime-list { 
+            width: 80%;
+            margin: 10px auto; /* Ridotto il margine tra il titolo e i box */
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .anime-item { 
+            display: flex;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 46px;
+            position: relative;
+            height: 122px;
+            width: 100%;
+            max-width: 1300px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+            transition: opacity 0.8s ease; /* Rimuovi il transform: scale() */
+        }
+
+        .anime-item:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8); /* Solo l'ombra al passaggio del mouse */
+        }
+
+        .anime-rank { 
+            font-size: 50px;
+            font-weight: bold;
+            color: rgb(79, 165, 199);
+            background: none;
+            border: none;
+            outline: none;
+            position: absolute;
+            left: -80px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-shadow: 2px 2px 4px rgba(3, 16, 53, 0.7);
+        }
+
+        .anime-item img.main-image { 
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
+            cursor: pointer; /* Impostato per indicare che è cliccabile */
+        }
+
+        .anime-info { 
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 20px;
+        }
+
+        .anime-title, .anime-season { 
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            background: none;
+            border: none;
+            width: 100%;
+            outline: none;
+        }
+
+        .anime-season { 
+            font-size: 20px;
+            font-weight: normal;
+            margin-top: 10px;
+        }
+
+        .rating { 
+            display: flex;
+            gap: 5px;
+            margin-left: auto;
+        }
+
+        .moon { 
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+        }
+
+        /* Input per la selezione dell'immagine */
+        .image-input {
+            display: none; /* Nasconde l'input file */
+        }
+
+    </style>
+</head>
+<body>
+
+  
+    <div class="anime-list" id="animeList"></div>
+
+    <script>
+        const animeData = [
+            { title: "The Promised Neverland", season: "2", image: "image/anime1.jpg", rating: 0, rank: "#1" },
+            { title: "Attack on Titan", season: "Final", image: "image/anime2.jpg", rating: 0, rank: "#2" },
+            { title: "Demon Slayer", season: "2", image: "image/anime3.jpg", rating: 0, rank: "#3" },
+            { title: "My Hero Academia", season: "5", image: "image/anime4.jpg", rating: 0, rank: "#4" },
+            { title: "Jujutsu Kaisen", season: "1", image: "image/anime5.jpg", rating: 0, rank: "#5" }
+        ];
+
+        function generateAnimeList() {
+            const listContainer = document.getElementById("animeList");
+            listContainer.innerHTML = "";
+            animeData.forEach((anime, index) => {
+                let moons = "";
+                for (let i = 1; i <= 5; i++) {
+                    moons += `<img src="${i <= anime.rating ? 'image/punto.svg' : 'image/punto vuoto2.0.svg'}" class="moon" onclick="setRating(${index}, ${i})">`;
+                }
+                listContainer.innerHTML += `
+                    <div class="anime-item" id="anime-${index}">
+                        <div class="anime-rank">${anime.rank}</div>
+                        <!-- Cliccando sull'immagine si seleziona una nuova immagine -->
+                        <img src="${anime.image}" alt="Anime Image" class="main-image" onclick="changeImage(${index})">
+                        <!-- Input file nascosto per la selezione dell'immagine -->
+                        <input type="file" class="image-input" id="image-input-${index}" onchange="updateImage(${index}, this)">
+                        <div class="anime-info">
+                            <input type="text" class="anime-title" value="${anime.title}" oninput="updateTitle(${index}, this.value)">
+                            <input type="text" class="anime-season" value="Season ${anime.season}" oninput="updateSeason(${index}, this.value)">
+                        </div>
+                        <div class="rating">${moons}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function changeImage(index) {
+            const input = document.getElementById(`image-input-${index}`);
+            input.click(); // Trigger dell'input file
+        }
+
+        function updateImage(index, inputElement) {
+            const file = inputElement.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    animeData[index].image = event.target.result; // Aggiorna l'immagine
+                    generateAnimeList(); // Rende visibile l'immagine aggiornata
+                };
+                reader.readAsDataURL(file); // Legge il file come URL
+            }
+        }
+
+        function setRating(index, rating) {
+            animeData[index].rating = animeData[index].rating === rating ? 0 : rating;
+            generateAnimeList();
+        }
+
+        function updateTitle(index, newTitle) {
+            animeData[index].title = newTitle;
+        }
+
+        function updateSeason(index, newSeason) {
+            animeData[index].season = newSeason.replace("Season ", "");
+        }
+
+        generateAnimeList();
+    </script>
+</body>
+</html>

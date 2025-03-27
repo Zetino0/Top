@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 10 Anime</title>
+    <style>
+        body { 
+            background: url('image/sfondo.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .anime-list {
+            display: flex;
+            justify-content: space-between; /* Separazione tra le due colonne */
+            gap: 30px;
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        .anime-column {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 45%; /* Ridotto per farle stare separati */
+        }
+
+        .anime-item { 
+            display: flex;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 46px;
+            position: relative;
+            height: 122px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+            transition: opacity 0.8s ease;
+        }
+
+        .anime-item:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .anime-rank { 
+    font-size: 50px;
+    font-weight: bold;
+    color: rgb(79, 165, 199);
+    position: absolute;
+    left: -80px;  /* Posizione di default (sinistra) */
+    top: 50%;
+    transform: translateY(-50%);
+    text-shadow: 2px 2px 4px rgba(3, 16, 53, 0.7);
+}
+
+.anime-column:nth-child(2) {
+    padding-left: 20px;  /* Aggiungi un po' di spazio tra la colonna sinistra e quella destra */
+}
+
+.anime-item .anime-rank {
+    left: auto;  /* Rimuovi la posizione a sinistra per la colonna di destra */
+    left: -90px; /* Posiziona il numero di classifica a destra */
+}
+
+        .anime-item img.main-image { 
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: center;
+            cursor: pointer;
+        }
+
+        .anime-info { 
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 20px;
+        }
+
+        .anime-title, .anime-season { 
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: none;
+            border: none;
+            width: 100%;
+            outline: none;
+        }
+
+        .anime-season { 
+            font-size: 20px;
+            font-weight: normal;
+            margin-top: 10px;
+        }
+
+        .rating { 
+            display: flex;
+            gap: 5px;
+            margin-left: auto;
+        }
+
+        .moon { 
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        .image-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="anime-list" id="animeList"></div>
+
+    <script>
+        const animeData = [
+            { title: "The Promised Neverland", season: "2", image: "image/anime1.jpg", rating: 0, rank: "#1" },
+            { title: "Attack on Titan", season: "Final", image: "image/anime2.jpg", rating: 0, rank: "#2" },
+            { title: "Demon Slayer", season: "2", image: "image/anime3.jpg", rating: 0, rank: "#3" },
+            { title: "My Hero Academia", season: "5", image: "image/anime4.jpg", rating: 0, rank: "#4" },
+            { title: "Jujutsu Kaisen", season: "1", image: "image/anime5.jpg", rating: 0, rank: "#5" },
+            { title: "One Piece", season: "20", image: "image/anime6.jpg", rating: 0, rank: "#6" },
+            { title: "Naruto", season: "Shippuden", image: "image/anime7.jpg", rating: 0, rank: "#7" },
+            { title: "Bleach", season: "Final Arc", image: "image/anime8.jpg", rating: 0, rank: "#8" },
+            { title: "Fullmetal Alchemist", season: "Brotherhood", image: "image/anime9.jpg", rating: 0, rank: "#9" },
+            { title: "Tokyo Ghoul", season: "2", image: "image/anime10.jpg", rating: 0, rank: "#10" }
+        ];
+
+        function generateAnimeList() {
+            const listContainer = document.getElementById("animeList");
+            listContainer.innerHTML = "";
+            const firstColumn = document.createElement("div");
+            firstColumn.classList.add("anime-column");
+
+            const secondColumn = document.createElement("div");
+            secondColumn.classList.add("anime-column");
+
+            animeData.forEach((anime, index) => {
+                let moons = "";
+                for (let i = 1; i <= 5; i++) {
+                    moons += `<img src="${i <= anime.rating ? 'image/punto.svg' : 'image/punto vuoto2.0.svg'}" class="moon" onclick="setRating(${index}, ${i})">`;
+                }
+
+                const animeItem = `
+                    <div class="anime-item" id="anime-${index}">
+                        <div class="anime-rank">${anime.rank}</div>
+                        <img src="${anime.image}" alt="Anime Image" class="main-image" onclick="changeImage(${index})">
+                        <input type="file" class="image-input" id="image-input-${index}" onchange="updateImage(${index}, this)">
+                        <div class="anime-info">
+                            <input type="text" class="anime-title" value="${anime.title}" oninput="updateTitle(${index}, this.value)">
+                            <input type="text" class="anime-season" value="Season ${anime.season}" oninput="updateSeason(${index}, this.value)">
+                        </div>
+                        <div class="rating">${moons}</div>
+                    </div>
+                `;
+
+                if (index < 5) {
+                    firstColumn.innerHTML += animeItem;
+                } else {
+                    secondColumn.innerHTML += animeItem;
+                }
+            });
+
+            listContainer.appendChild(firstColumn);
+            listContainer.appendChild(secondColumn);
+        }
+
+        function changeImage(index) {
+            const input = document.getElementById(`image-input-${index}`);
+            input.click();
+        }
+
+        function updateImage(index, inputElement) {
+            const file = inputElement.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    animeData[index].image = event.target.result;
+                    generateAnimeList();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function setRating(index, rating) {
+            animeData[index].rating = animeData[index].rating === rating ? 0 : rating;
+            generateAnimeList();
+        }
+
+        function updateTitle(index, newTitle) {
+            animeData[index].title = newTitle;
+        }
+
+        function updateSeason(index, newSeason) {
+            animeData[index].season = newSeason.replace("Season ", "");
+        }
+
+        generateAnimeList();
+    </script>
+</body>
+</html>
